@@ -1,0 +1,34 @@
+{
+  "name": "skill-issue-drafter",
+  "version": "0.1.0",
+  "description": "Dry-run GitHub issue draft generator for agent findings.",
+  "type": "module",
+  "bin": {
+    "skill-issue-drafter": "./bin/skill-issue-drafter.js"
+  },
+  "scripts": {
+    "test": "node --test",
+    "check": "node --check src/index.js && node --check src/markdown.js && node --check bin/skill-issue-drafter.js && node --check test/index.test.js",
+    "smoke": "node bin/skill-issue-drafter.js examples/findings.json --out /tmp/skill-issue-drafter.md"
+  },
+  "keywords": [
+    "agent",
+    "github",
+    "issues",
+    "dry-run",
+    "skill"
+  ],
+  "author": "Roger Chappel",
+  "license": "MIT",
+  "engines": {
+    "node": ">=20"
+  },
+  "files": [
+    "bin",
+    "src",
+    "docs",
+    "examples",
+    "SKILL.md",
+    "README.md"
+  ]
+}
