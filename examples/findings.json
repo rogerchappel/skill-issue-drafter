@@ -1,0 +1,25 @@
+{
+  "repo": "rogerchappel/example-skill",
+  "defaultOwner": "maintainer",
+  "findings": [
+    {
+      "title": "Skill instructions omit side-effect boundary",
+      "severity": "high",
+      "owner": "docs",
+      "file": "SKILL.md",
+      "evidence": "The skill lists required tools but does not state whether connector calls are allowed.",
+      "reproduction": "Open SKILL.md and inspect the approval section.",
+      "proposedFix": "Add explicit read-only, writes-local, and external-action boundaries.",
+      "verification": "Run the skill packaging smoke check and confirm the generated report includes side-effect policy."
+    },
+    {
+      "title": "Smoke fixture does not cover empty input",
+      "severity": "medium",
+      "file": "test/fixtures/basic.json",
+      "evidence": "Only the happy path fixture is present.",
+      "reproduction": "Review test/fixtures and test output.",
+      "proposedFix": "Add an empty-input fixture and expected warning snapshot.",
+      "verification": "npm test"
+    }
+  ]
+}
