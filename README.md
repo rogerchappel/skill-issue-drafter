@@ -5,6 +5,15 @@ Dry-run GitHub issue draft generator for agent findings. It turns structured rev
 ## Quickstart
 
 ```bash
+npm install -g skill-issue-drafter
+skill-issue-drafter --help
+skill-issue-drafter --version
+skill-issue-drafter examples/findings.json
+```
+
+For local development:
+
+```bash
 npm install
 npm run smoke
 node bin/skill-issue-drafter.js examples/findings.json
