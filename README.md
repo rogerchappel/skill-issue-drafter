@@ -9,6 +9,7 @@ npm install -g skill-issue-drafter
 skill-issue-drafter --help
 skill-issue-drafter --version
 skill-issue-drafter examples/findings.json
+skill-issue-drafter examples/findings.json --out issue.md
 ```
 
 For local development:
@@ -22,6 +23,10 @@ node bin/skill-issue-drafter.js examples/findings.json
 ## Input shape
 
 The input JSON includes `repo`, optional `defaultOwner`, and a `findings` array. Each finding can include `title`, `severity`, `owner`, `file`, `evidence`, `reproduction`, `proposedFix`, and `verification`.
+
+## Command-line options
+
+`--out <file>` writes the generated Markdown to a file instead of stdout. Options that are not listed by `--help`, and `--out` without a file path, are usage errors.
 
 ## Safety
 
