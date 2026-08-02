@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 import fs from 'node:fs';
-import { loadFindings, buildIssueDraft } from '../src/index.js';
+import { loadFindings, buildIssueDraft, InputValidationError } from '../src/index.js';
 import { renderIssueMarkdown } from '../src/markdown.js';
 
 const VERSION = '0.1.0';
@@ -49,7 +49,14 @@ for (let index = 0; index < args.length; index += 1) {
 }
 if (!inputPath) usageError('A findings JSON file is required.');
 
-const markdown = renderIssueMarkdown(buildIssueDraft(loadFindings(inputPath)));
-if (outPath) fs.writeFileSync(outPath, markdown + '\n');
-else console.log(markdown);
-process.exit(0);
+try {
+  const markdown = renderIssueMarkdown(buildIssueDraft(loadFindings(inputPath)));
+  if (outPath) fs.writeFileSync(outPath, markdown + '\n');
+  else console.log(markdown);
+} catch (error) {
+  if (error instanceof InputValidationError || error instanceof SyntaxError) {
+    console.error(`Invalid findings data: ${error.message}`);
+    process.exit(3);
+  }
+  throw error;
+}

@@ -22,7 +22,19 @@ node bin/skill-issue-drafter.js examples/findings.json
 
 ## Input shape
 
-The input JSON includes `repo`, optional `defaultOwner`, and a `findings` array. Each finding can include `title`, `severity`, `owner`, `file`, `evidence`, `reproduction`, `proposedFix`, and `verification`.
+The input must be a JSON object with a non-empty string `repo` and a `findings` array. Every finding must be an object with non-empty string `title` and `evidence` fields. `defaultOwner`, `severity`, `owner`, `file`, `reproduction`, `proposedFix`, and `verification` are optional. Missing optional text uses the draft defaults; an unknown `severity` is normalized to `medium`.
+
+```json
+{
+  "repo": "owner/project",
+  "defaultOwner": "maintainer",
+  "findings": [
+    { "title": "Missing check", "evidence": "The CI workflow does not run tests.", "severity": "high" }
+  ]
+}
+```
+
+Missing or wrongly typed top-level fields, non-object finding entries, and missing required finding fields are data errors. The CLI writes a concise `Invalid findings data: ...` message to stderr, produces no draft, and exits with status `3`. Invalid JSON is reported the same way. Status `2` remains reserved for command-line usage errors.
 
 ## Command-line options
 

@@ -4,8 +4,24 @@ export function loadFindings(filePath) {
   return normalizeInput(JSON.parse(fs.readFileSync(filePath, 'utf8')));
 }
 
+export class InputValidationError extends Error {
+  constructor(message) {
+    super(message);
+    this.name = 'InputValidationError';
+  }
+}
+
 export function normalizeInput(input) {
-  return { repo: input.repo ?? 'unknown/repo', defaultOwner: input.defaultOwner ?? 'maintainer', findings: Array.isArray(input.findings) ? input.findings.map(normalizeFinding) : [] };
+  if (!input || typeof input !== 'object' || Array.isArray(input)) throw new InputValidationError('input must be a JSON object');
+  requireNonEmptyString(input.repo, 'repo');
+  if (!Array.isArray(input.findings)) throw new InputValidationError('findings must be an array');
+  if (input.defaultOwner !== undefined) requireNonEmptyString(input.defaultOwner, 'defaultOwner');
+
+  return {
+    repo: input.repo,
+    defaultOwner: input.defaultOwner ?? 'maintainer',
+    findings: input.findings.map((item, index) => normalizeFinding(item, index)),
+  };
 }
 
 export function buildIssueDraft(input) {
@@ -21,17 +37,26 @@ export function buildIssueDraft(input) {
   };
 }
 
-function normalizeFinding(item) {
+function normalizeFinding(item, index) {
+  const path = `findings[${index}]`;
+  if (!item || typeof item !== 'object' || Array.isArray(item)) throw new InputValidationError(`${path} must be an object`);
+  requireNonEmptyString(item.title, `${path}.title`);
+  requireNonEmptyString(item.evidence, `${path}.evidence`);
+
   return {
-    title: item.title ?? '',
+    title: item.title,
     severity: ['critical', 'high', 'medium', 'low'].includes(item.severity) ? item.severity : 'medium',
     owner: item.owner ?? undefined,
     file: item.file ?? undefined,
-    evidence: item.evidence ?? '',
+    evidence: item.evidence,
     reproduction: item.reproduction ?? 'Not provided.',
     proposedFix: item.proposedFix ?? 'Decide owner and patch scope.',
     verification: item.verification ?? 'Add or run a focused regression check.',
   };
+}
+
+function requireNonEmptyString(value, path) {
+  if (typeof value !== 'string' || value.trim() === '') throw new InputValidationError(`${path} must be a non-empty string`);
 }
 
 function groupBySeverity(findings) {
