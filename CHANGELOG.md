@@ -3,6 +3,8 @@
 ## Unreleased
 
 - Reject unknown command-line options and missing `--out` file paths with usage diagnostics.
+- Validate every supplied optional finding field as a non-empty string.
+- Report input and output filesystem failures with concise diagnostics and exit status `4`.
 
 ## 0.1.0
 
