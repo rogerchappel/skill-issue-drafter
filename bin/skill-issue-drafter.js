@@ -49,14 +49,32 @@ for (let index = 0; index < args.length; index += 1) {
 }
 if (!inputPath) usageError('A findings JSON file is required.');
 
+let draft;
 try {
-  const markdown = renderIssueMarkdown(buildIssueDraft(loadFindings(inputPath)));
-  if (outPath) fs.writeFileSync(outPath, markdown + '\n');
-  else console.log(markdown);
+  draft = buildIssueDraft(loadFindings(inputPath));
 } catch (error) {
   if (error instanceof InputValidationError || error instanceof SyntaxError) {
     console.error(`Invalid findings data: ${error.message}`);
     process.exit(3);
   }
+  if (typeof error?.code === 'string') {
+    console.error(`Could not read findings file: ${inputPath}`);
+    process.exit(4);
+  }
   throw error;
+}
+
+const markdown = renderIssueMarkdown(draft);
+if (outPath) {
+  try {
+    fs.writeFileSync(outPath, markdown + '\n');
+  } catch (error) {
+    if (typeof error?.code === 'string') {
+      console.error(`Could not write output file: ${outPath}`);
+      process.exit(4);
+    }
+    throw error;
+  }
+} else {
+  console.log(markdown);
 }

@@ -42,12 +42,15 @@ function normalizeFinding(item, index) {
   if (!item || typeof item !== 'object' || Array.isArray(item)) throw new InputValidationError(`${path} must be an object`);
   requireNonEmptyString(item.title, `${path}.title`);
   requireNonEmptyString(item.evidence, `${path}.evidence`);
+  for (const field of ['severity', 'owner', 'file', 'reproduction', 'proposedFix', 'verification']) {
+    if (item[field] !== undefined) requireNonEmptyString(item[field], `${path}.${field}`);
+  }
 
   return {
     title: item.title,
     severity: ['critical', 'high', 'medium', 'low'].includes(item.severity) ? item.severity : 'medium',
-    owner: item.owner ?? undefined,
-    file: item.file ?? undefined,
+    owner: item.owner,
+    file: item.file,
     evidence: item.evidence,
     reproduction: item.reproduction ?? 'Not provided.',
     proposedFix: item.proposedFix ?? 'Decide owner and patch scope.',

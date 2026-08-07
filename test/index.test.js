@@ -33,6 +33,21 @@ test('rejects missing required repository and evidence fields', () => {
   assert.throws(() => normalizeInput({ repo: 'a/b', findings: [{ evidence: 'e' }] }), /findings\[0\]\.title must be a non-empty string/u);
 });
 
+test('rejects malformed optional text fields with field-specific errors', () => {
+  const fields = ['severity', 'owner', 'file', 'reproduction', 'proposedFix', 'verification'];
+  for (const field of fields) {
+    assert.throws(
+      () => normalizeInput({ repo: 'a/b', findings: [{ title: 'x', evidence: 'e', [field]: {} }] }),
+      new RegExp(`findings\\[0\\]\\.${field} must be a non-empty string`, 'u'),
+    );
+  }
+
+  assert.throws(
+    () => normalizeInput({ repo: 'a/b', findings: [{ title: 'x', evidence: 'e', owner: '   ' }] }),
+    /findings\[0\]\.owner must be a non-empty string/u,
+  );
+});
+
 test('markdown states dry-run safety boundary', () => {
   const draft = buildIssueDraft(normalizeInput({ repo: 'a/b', findings: [{ title: 'x', evidence: 'e' }] }));
   assert.match(renderIssueMarkdown(draft), /No external issue was created/);
@@ -95,4 +110,32 @@ test('cli reports malformed findings as a stable data error without a stack trac
     assert.doesNotMatch(error.stderr, /\n\s+at /u);
     return true;
   });
+});
+
+test('cli reports input read failures without a stack trace', async () => {
+  const missingPath = join(tmpdir(), 'skill-issue-drafter-missing-input.json');
+
+  await assert.rejects(execFileAsync('node', ['bin/skill-issue-drafter.js', missingPath]), (error) => {
+    assert.equal(error.code, 4);
+    assert.equal(error.stdout, '');
+    assert.equal(error.stderr, `Could not read findings file: ${missingPath}\n`);
+    assert.doesNotMatch(error.stderr, /ENOENT|\n\s+at /u);
+    return true;
+  });
+});
+
+test('cli reports output write failures without a stack trace', async () => {
+  const directory = await mkdtemp(join(tmpdir(), 'skill-issue-drafter-'));
+  const outputPath = join(directory, 'missing', 'issue.md');
+
+  await assert.rejects(
+    execFileAsync('node', ['bin/skill-issue-drafter.js', 'examples/findings.json', '--out', outputPath]),
+    (error) => {
+      assert.equal(error.code, 4);
+      assert.equal(error.stdout, '');
+      assert.equal(error.stderr, `Could not write output file: ${outputPath}\n`);
+      assert.doesNotMatch(error.stderr, /ENOENT|\n\s+at /u);
+      return true;
+    },
+  );
 });
