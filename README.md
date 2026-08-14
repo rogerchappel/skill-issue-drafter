@@ -5,12 +5,17 @@ Dry-run GitHub issue draft generator for agent findings. It turns structured rev
 ## Quickstart
 
 ```bash
-npm install -g skill-issue-drafter
+npm install --global github:rogerchappel/skill-issue-drafter
 skill-issue-drafter --help
 skill-issue-drafter --version
 skill-issue-drafter examples/findings.json
 skill-issue-drafter examples/findings.json --out issue.md
 ```
+
+The package is not published to the npm registry yet. The GitHub install above
+uses the current release candidate directly; the shorter
+`npm install --global skill-issue-drafter` command will become available after
+the first npm publication.
 
 For local development:
 
