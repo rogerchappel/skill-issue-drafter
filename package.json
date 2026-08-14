@@ -8,9 +8,9 @@
   },
   "scripts": {
     "test": "node --test",
-    "check": "node --check src/index.js && node --check src/markdown.js && node --check bin/skill-issue-drafter.js && node --check test/index.test.js",
+    "check": "node --check src/index.js && node --check src/markdown.js && node --check bin/skill-issue-drafter.js && node --check test/index.test.js && bash -n scripts/package-smoke.sh",
     "smoke": "node bin/skill-issue-drafter.js examples/findings.json --out /tmp/skill-issue-drafter.md",
-    "package:smoke": "npm pack --dry-run",
+    "package:smoke": "bash scripts/package-smoke.sh",
     "release:check": "npm run check && npm test && npm run smoke && npm run package:smoke"
   },
   "keywords": [
