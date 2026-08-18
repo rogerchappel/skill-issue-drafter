@@ -8,8 +8,19 @@ Dry-run GitHub issue draft generator for agent findings. It turns structured rev
 npm install --global github:rogerchappel/skill-issue-drafter
 skill-issue-drafter --help
 skill-issue-drafter --version
-skill-issue-drafter examples/findings.json
-skill-issue-drafter examples/findings.json --out issue.md
+cat > findings.json <<'JSON'
+{
+  "repo": "owner/project",
+  "findings": [
+    {
+      "title": "Document the verification command",
+      "evidence": "The contributor guide omits the package smoke test."
+    }
+  ]
+}
+JSON
+skill-issue-drafter findings.json
+skill-issue-drafter findings.json --out issue.md
 ```
 
 The package is not published to the npm registry yet. The GitHub install above
