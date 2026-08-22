@@ -38,7 +38,7 @@ node bin/skill-issue-drafter.js examples/findings.json
 
 ## Input shape
 
-The input must be a JSON object with a non-empty string `repo` and a `findings` array. Every finding must be an object with non-empty string `title` and `evidence` fields. `defaultOwner`, `severity`, `owner`, `file`, `reproduction`, `proposedFix`, and `verification` are optional non-empty strings. Missing optional text uses the draft defaults; an unknown non-empty `severity` string is normalized to `medium`.
+The input must be a JSON object with a non-empty string `repo` and a `findings` array containing at least one item. Every finding must be an object with non-empty string `title` and `evidence` fields. `defaultOwner`, `severity`, `owner`, `file`, `reproduction`, `proposedFix`, and `verification` are optional non-empty strings. Missing optional text uses the draft defaults; an unknown non-empty `severity` string is normalized to `medium`.
 
 ```json
 {
@@ -50,7 +50,7 @@ The input must be a JSON object with a non-empty string `repo` and a `findings` 
 }
 ```
 
-Missing or wrongly typed top-level fields, non-object finding entries, missing required finding fields, and malformed optional fields are data errors. The CLI writes a concise `Invalid findings data: ...` message to stderr, produces no draft, and exits with status `3`. Invalid JSON is reported the same way. Status `2` remains reserved for command-line usage errors.
+Missing or wrongly typed top-level fields, an empty `findings` array, non-object finding entries, missing required finding fields, and malformed optional fields are data errors. The CLI writes a concise `Invalid findings data: ...` message to stderr, produces no draft, and exits with status `3`. Invalid JSON is reported the same way. Status `2` remains reserved for command-line usage errors.
 
 ## Command-line options
 
