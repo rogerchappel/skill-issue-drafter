@@ -24,6 +24,7 @@ test('normalizes unknown severity to medium', () => {
 
 test('rejects missing findings and malformed finding entries', () => {
   assert.throws(() => normalizeInput({ repo: 'a/b' }), (error) => error instanceof InputValidationError && error.message === 'findings must be an array');
+  assert.throws(() => normalizeInput({ repo: 'a/b', findings: [] }), /findings must contain at least one item/u);
   assert.throws(() => normalizeInput({ repo: 'a/b', findings: [null] }), /findings\[0\] must be an object/u);
 });
 
@@ -108,6 +109,19 @@ test('cli reports malformed findings as a stable data error without a stack trac
     assert.equal(error.stdout, '');
     assert.match(error.stderr, /Invalid findings data: findings\[0\] must be an object/u);
     assert.doesNotMatch(error.stderr, /\n\s+at /u);
+    return true;
+  });
+});
+
+test('cli rejects empty findings without emitting Markdown', async () => {
+  const directory = await mkdtemp(join(tmpdir(), 'skill-issue-drafter-'));
+  const inputPath = join(directory, 'empty.json');
+  await writeFile(inputPath, '{"repo":"a/b","findings":[]}');
+
+  await assert.rejects(execFileAsync('node', ['bin/skill-issue-drafter.js', inputPath]), (error) => {
+    assert.equal(error.code, 3);
+    assert.equal(error.stdout, '');
+    assert.equal(error.stderr, 'Invalid findings data: findings must contain at least one item\n');
     return true;
   });
 });

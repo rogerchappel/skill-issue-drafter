@@ -15,6 +15,7 @@ export function normalizeInput(input) {
   if (!input || typeof input !== 'object' || Array.isArray(input)) throw new InputValidationError('input must be a JSON object');
   requireNonEmptyString(input.repo, 'repo');
   if (!Array.isArray(input.findings)) throw new InputValidationError('findings must be an array');
+  if (input.findings.length === 0) throw new InputValidationError('findings must contain at least one item');
   if (input.defaultOwner !== undefined) requireNonEmptyString(input.defaultOwner, 'defaultOwner');
 
   return {
