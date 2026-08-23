@@ -63,6 +63,20 @@ test('cli prints help and version', async () => {
   assert.equal(version.stdout, '0.1.0\n');
 });
 
+test('cli rejects help mixed with other arguments', async () => {
+  for (const argumentsList of [
+    ['examples/findings.json', '--help'],
+    ['--help', '--bogus'],
+  ]) {
+    await assert.rejects(execFileAsync('node', ['bin/skill-issue-drafter.js', ...argumentsList]), (error) => {
+      assert.equal(error.code, 2);
+      assert.equal(error.stdout, '');
+      assert.match(error.stderr, /Usage:/u);
+      return true;
+    });
+  }
+});
+
 test('cli writes a draft to the requested output path', async () => {
   const directory = await mkdtemp(join(tmpdir(), 'skill-issue-drafter-'));
   const outputPath = join(directory, 'issue.md');
@@ -84,6 +98,31 @@ test('cli rejects --out without a value', async () => {
       return true;
     },
   );
+});
+
+test('cli rejects repeated --out options', async () => {
+  const directory = await mkdtemp(join(tmpdir(), 'skill-issue-drafter-'));
+  const firstOutputPath = join(directory, 'first.md');
+  const secondOutputPath = join(directory, 'second.md');
+
+  await assert.rejects(
+    execFileAsync('node', [
+      'bin/skill-issue-drafter.js',
+      'examples/findings.json',
+      '--out', firstOutputPath,
+      '--out', secondOutputPath,
+    ]),
+    (error) => {
+      assert.equal(error.code, 2);
+      assert.equal(error.stdout, '');
+      assert.match(error.stderr, /--out may only be specified once/u);
+      assert.match(error.stderr, /Usage:/u);
+      return true;
+    },
+  );
+
+  await assert.rejects(readFile(firstOutputPath, 'utf8'), { code: 'ENOENT' });
+  await assert.rejects(readFile(secondOutputPath, 'utf8'), { code: 'ENOENT' });
 });
 
 test('cli rejects unknown options', async () => {

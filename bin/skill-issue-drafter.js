@@ -16,7 +16,7 @@ function usageError(message) {
   process.exit(2);
 }
 
-if (args.includes('--help')) {
+if (args.length === 1 && args[0] === '--help') {
   console.log(usage);
   process.exit(0);
 }
@@ -34,6 +34,9 @@ let outPath;
 for (let index = 0; index < args.length; index += 1) {
   const argument = args[index];
   if (argument === '--out') {
+    if (outPath !== undefined) {
+      usageError('--out may only be specified once.');
+    }
     if (index + 1 >= args.length || args[index + 1].startsWith('-')) {
       usageError('--out requires a file path.');
     }
