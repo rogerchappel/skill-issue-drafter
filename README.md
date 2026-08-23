@@ -54,7 +54,7 @@ Missing or wrongly typed top-level fields, an empty `findings` array, non-object
 
 ## Command-line options
 
-`--out <file>` writes the generated Markdown to a file instead of stdout. Options that are not listed by `--help`, and `--out` without a file path, are usage errors.
+`--out <file>` writes the generated Markdown to a file instead of stdout and may be specified only once. Options that are not listed by `--help`, a repeated `--out`, and `--out` without a file path are usage errors. `--help` succeeds only when used by itself.
 
 If the input file cannot be read or the output file cannot be written, the CLI prints a concise path-specific diagnostic without a stack trace and exits with status `4`.
 
