@@ -63,6 +63,17 @@ test('cli prints help and version', async () => {
   assert.equal(version.stdout, '0.1.0\n');
 });
 
+test('cli reports a missing findings path as a usage error', async () => {
+  await assert.rejects(execFileAsync('node', ['bin/skill-issue-drafter.js']), (error) => {
+    assert.equal(error.code, 2);
+    assert.equal(error.stdout, '');
+    assert.match(error.stderr, /A findings JSON file is required\./u);
+    assert.match(error.stderr, /Usage:/u);
+    assert.doesNotMatch(error.stderr, /\n\s+at /u);
+    return true;
+  });
+});
+
 test('cli rejects help mixed with other arguments', async () => {
   for (const argumentsList of [
     ['examples/findings.json', '--help'],
