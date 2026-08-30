@@ -25,8 +25,7 @@ if (args.length === 1 && (args[0] === '--version' || args[0] === '-v')) {
   process.exit(0);
 }
 if (args.length === 0) {
-  console.log(usage);
-  process.exit(1);
+  usageError('A findings JSON file is required.');
 }
 
 let inputPath;
