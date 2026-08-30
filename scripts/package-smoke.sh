@@ -27,6 +27,20 @@ JSON
 
 "$installed_cli" --help >/dev/null
 test "$("$installed_cli" --version)" = "$expected_version"
+if "$installed_cli" >"$smoke_dir/missing-input.stdout" 2>"$smoke_dir/missing-input.stderr"; then
+  echo "Installed CLI unexpectedly accepted a missing findings path." >&2
+  exit 1
+else
+  missing_input_status=$?
+fi
+test "$missing_input_status" -eq 2
+test ! -s "$smoke_dir/missing-input.stdout"
+grep -Fq 'A findings JSON file is required.' "$smoke_dir/missing-input.stderr"
+grep -Fq 'Usage:' "$smoke_dir/missing-input.stderr"
+if grep -Eq '^[[:space:]]+at ' "$smoke_dir/missing-input.stderr"; then
+  echo "Installed CLI emitted a stack trace for missing input." >&2
+  exit 1
+fi
 stdout_markdown=$(cd "$smoke_dir" && "$installed_cli" findings.json)
 grep -Fq '# Follow-up: Document the verification command' <<<"$stdout_markdown"
 grep -Fq 'Repository: rogerchappel/example-skill' <<<"$stdout_markdown"
