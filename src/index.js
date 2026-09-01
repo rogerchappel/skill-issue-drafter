@@ -19,8 +19,8 @@ export function normalizeInput(input) {
   if (input.defaultOwner !== undefined) requireNonEmptyString(input.defaultOwner, 'defaultOwner');
 
   return {
-    repo: input.repo,
-    defaultOwner: input.defaultOwner ?? 'maintainer',
+    repo: input.repo.trim(),
+    defaultOwner: input.defaultOwner?.trim() ?? 'maintainer',
     findings: input.findings.map((item, index) => normalizeFinding(item, index)),
   };
 }
@@ -47,15 +47,16 @@ function normalizeFinding(item, index) {
     if (item[field] !== undefined) requireNonEmptyString(item[field], `${path}.${field}`);
   }
 
+  const severity = item.severity?.trim();
   return {
-    title: item.title,
-    severity: ['critical', 'high', 'medium', 'low'].includes(item.severity) ? item.severity : 'medium',
-    owner: item.owner,
-    file: item.file,
-    evidence: item.evidence,
-    reproduction: item.reproduction ?? 'Not provided.',
-    proposedFix: item.proposedFix ?? 'Decide owner and patch scope.',
-    verification: item.verification ?? 'Add or run a focused regression check.',
+    title: item.title.trim(),
+    severity: ['critical', 'high', 'medium', 'low'].includes(severity) ? severity : 'medium',
+    owner: item.owner?.trim(),
+    file: item.file?.trim(),
+    evidence: item.evidence.trim(),
+    reproduction: item.reproduction?.trim() ?? 'Not provided.',
+    proposedFix: item.proposedFix?.trim() ?? 'Decide owner and patch scope.',
+    verification: item.verification?.trim() ?? 'Add or run a focused regression check.',
   };
 }
 
