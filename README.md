@@ -38,7 +38,7 @@ node bin/skill-issue-drafter.js examples/findings.json
 
 ## Input shape
 
-The input must be a JSON object with a non-empty string `repo` and a `findings` array containing at least one item. Every finding must be an object with non-empty string `title` and `evidence` fields. `defaultOwner`, `severity`, `owner`, `file`, `reproduction`, `proposedFix`, and `verification` are optional non-empty strings. Missing optional text uses the draft defaults; an unknown non-empty `severity` string is normalized to `medium`.
+The input must be a JSON object with a non-empty string `repo` and a `findings` array containing at least one item. Every finding must be an object with non-empty string `title` and `evidence` fields. `defaultOwner`, `severity`, `owner`, `file`, `reproduction`, `proposedFix`, and `verification` are optional non-empty strings. Leading and trailing whitespace is removed from every accepted string before grouping and rendering. Missing optional text uses the draft defaults; after trimming, an unknown non-empty `severity` string is normalized to `medium`.
 
 ```json
 {
