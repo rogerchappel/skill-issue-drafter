@@ -22,6 +22,35 @@ test('normalizes unknown severity to medium', () => {
   assert.equal(draft.grouped.medium.length, 1);
 });
 
+test('trims every accepted string before drafting', () => {
+  const input = normalizeInput({
+    repo: '  a/b  ',
+    defaultOwner: '  maintainer  ',
+    findings: [{
+      title: '  Padded finding  ',
+      severity: ' high ',
+      owner: '  ci  ',
+      file: '  src/index.js  ',
+      evidence: '  Missing coverage.  ',
+      reproduction: '  Run the command.  ',
+      proposedFix: '  Add coverage.  ',
+      verification: '  Run npm test.  ',
+    }],
+  });
+  const draft = buildIssueDraft(input);
+  const markdown = renderIssueMarkdown(draft);
+
+  assert.equal(draft.repo, 'a/b');
+  assert.equal(draft.title, 'Follow-up: Padded finding');
+  assert.equal(draft.owner, 'ci');
+  assert.equal(draft.summary.high, 1);
+  assert.equal(draft.grouped.high.length, 1);
+  assert.match(markdown, /Repository: a\/b/u);
+  assert.match(markdown, /Affected file: `src\/index\.js`/u);
+  assert.match(markdown, /\*\*Evidence\*\*\nMissing coverage\./u);
+  assert.doesNotMatch(markdown, /  (?:a\/b|maintainer|Padded finding|ci|src\/index\.js|Missing coverage\.)  /u);
+});
+
 test('rejects missing findings and malformed finding entries', () => {
   assert.throws(() => normalizeInput({ repo: 'a/b' }), (error) => error instanceof InputValidationError && error.message === 'findings must be an array');
   assert.throws(() => normalizeInput({ repo: 'a/b', findings: [] }), /findings must contain at least one item/u);
@@ -96,6 +125,22 @@ test('cli writes a draft to the requested output path', async () => {
 
   assert.equal(result.stdout, '');
   assert.match(await readFile(outputPath, 'utf8'), /No external issue was created/u);
+});
+
+test('cli normalizes padded strings before rendering', async () => {
+  const directory = await mkdtemp(join(tmpdir(), 'skill-issue-drafter-'));
+  const inputPath = join(directory, 'padded.json');
+  await writeFile(inputPath, JSON.stringify({
+    repo: ' owner/project ',
+    findings: [{ title: ' Padded ', severity: ' high ', owner: ' team ', file: ' file.js ', evidence: ' proof ' }],
+  }));
+
+  const result = await execFileAsync('node', ['bin/skill-issue-drafter.js', inputPath]);
+  assert.match(result.stdout, /Repository: owner\/project/u);
+  assert.match(result.stdout, /### HIGH/u);
+  assert.match(result.stdout, /Suggested owner: team/u);
+  assert.match(result.stdout, /Affected file: `file\.js`/u);
+  assert.doesNotMatch(result.stdout, / medium| owner\/project | team | file\.js | proof /iu);
 });
 
 test('cli rejects --out without a value', async () => {
