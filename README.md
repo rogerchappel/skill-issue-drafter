@@ -32,7 +32,7 @@ For local development:
 
 ```bash
 npm install
-npm run smoke
+npm run release:check
 node bin/skill-issue-drafter.js examples/findings.json
 ```
 

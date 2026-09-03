@@ -1,6 +1,4 @@
 #!/usr/bin/env bash
 set -euo pipefail
-npm test
-npm run check
-npm run smoke
+npm run release:check
 test -s /tmp/skill-issue-drafter.md

@@ -6,9 +6,7 @@ ship
 
 ## Verification
 
-- `npm test`: pass
-- `npm run check`: pass
-- `npm run smoke`: pass
+- `npm run release:check`: pass (syntax, tests, CLI smoke, and installed-package smoke)
 
 ## Notes
 

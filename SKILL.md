@@ -12,4 +12,4 @@ Read-only by default. The CLI reads local findings and writes Markdown to stdout
 No approval is needed for local drafting. Explicit approval is required before any future connector writes issues.
 
 ## Validation
-Run `npm test`, `npm run check`, and `npm run smoke`.
+Run `npm run release:check`.
